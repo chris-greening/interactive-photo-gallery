@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div id="photo-menu">
+    <p>Welcome to my photography portfolio.</p>
+    <p>Drag, scroll, or click the elements above. <i id="pause-button" class="fas fa-pause"></i></p>
+    <button id="sphere">SPHERE</button>
+    <button id="helix">HELIX</button>
+    <button id="grid">GRID</button>
+    <button id="table">TABLE</button>
+  </div>
+  
+  <script type="text/javascript" src="{{ url_for('static', filename='js/urlParams.js') }}"></script>
+  <script type="module">
+    import { init, animate } from "{{ url_for('static', filename='js/photography/photoDisplay.js') }}";
+    $('#photoDisplayModal').on("hidden.bs.modal", function () {
+        removeUrlParam("id");
+    });
+    init({{ images| tojson | safe }});
+    animate();
+    // Add view=id to URL on View click
+    $(document).ready(function () {
+        // If URL contains view query param open respective modal on page load
+        let id = getUrlParam('id');
+        if (id) {
+            $("#photo" + id).click();
+        }
+    });
+    
+    // Previous/next button
+    $(".fa-angle-left").on("click", function() {
+      let id = parseInt(getUrlParam('id'));
+      $("#myModal").modal('hide');
+      removeUrlParam("id");
+      id--;
+      $("#photo" + id).click();
+    });
+    $(".fa-angle-right").on("click", function () {
+      let id = parseInt(getUrlParam('id'));
+      $("#myModal").modal('hide');
+      removeUrlParam("id");
+      id++;
+      $("#photo" + id).click();
+    });
+  </script>
+  <script type="module" src="{{ url_for('static', filename='js/photography/buttons.js') }}"></script>
+
+  <!-- Modal -->
+  <div class="modal fade" id="photoDisplayModal" tabindex="-1" role="dialog" aria-labelledby="photoDisplayModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="photoDisplayModalLabel"></h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-date">
+          <div class="row">
+            <div class="col-md-6">
+              <h6></h6>
+            </div>
+            <div class="col-md-6">
+              <a class="btn fab fa-instagram fa-lg float-right" target="_blank"></a>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <img>
+        </div>
+        <div class="modal-buttons">
+          <i class="fas fa-angle-left float-left"></i>
+          <i class="fas fa-angle-right float-right"></i>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    // HACK: This pushes the footer lower on the contact page if it's
+    // on mobile but isn't a permanent solution as it needs the images
+    // to load first and just isn't a good solution overall
+    window.addEventListener('load', function () {
+        if (window.innerWidth < 640) {
+          var footer = document.getElementById("footer");
+          footer.style.marginTop = "9em";
+        }
+      })
+
+  </script>
+{% endblock content %}
